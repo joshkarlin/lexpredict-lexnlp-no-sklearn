@@ -1,15 +1,17 @@
-[[source]]
-url = "https://pypi.org/simple"
-verify_ssl = true
-name = "pypi"
+[tool.poetry]
+name = "lexnlp"
+version = "4.20"
+description = "LexNLP without sklearn"
+authors = ["Lawd Research"]
 
-[packages]
+[tool.poetry.dependencies]
+python = "^3.8"
 beautifulsoup4 = "*"
 cloudpickle = "*"
 Cython = "*"
 dateparser = "*"
 elasticsearch = "*"
-gensim = "==4.1.2"
+gensim = "^4.2.0"
 importlib-metadata = "*"
 joblib = "*"
 lxml = "*"
@@ -22,7 +24,6 @@ python-dateutil = "*"
 regex = "*"
 reporters-db = "*"
 requests = "*"
-scikit-learn = "==0.24"
 scipy = "*"
 tqdm = "*"
 unidecode = "*"
@@ -30,7 +31,7 @@ us = "*"
 zahlwort2num = "*"
 numpy = "*"
 
-[dev-packages]
+[tool.poetry.group.dev.dependencies]
 coverage = "*"
 memory-profiler = "*"
 nose = "*"
@@ -38,5 +39,6 @@ pylint = "*"
 pytest = "*"
 sphinx = "*"
 
-[requires]
-python_version = "3.8"
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
