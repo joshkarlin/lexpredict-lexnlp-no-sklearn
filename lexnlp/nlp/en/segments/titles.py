@@ -16,14 +16,9 @@ import os
 import string
 from typing import Generator
 
-# Packages
 import joblib
-import numpy
 import pandas
-import requests
-import sklearn.ensemble
 
-# Project
 from lexnlp.nlp.en.segments.utils import build_document_line_distribution
 from lexnlp.utils.decorators import safe_failure
 from lexnlp.utils.unicode.unicode_lookup import UNICODE_CHAR_TOP_CATEGORY_MAPPING
@@ -152,66 +147,6 @@ def build_document_title_features(text: str, window_pre=3, window_post=3):
     return feature_df
 
 
-def build_model(training_file_path):
-    """
-    Build a title extraction model given a training file path.
-
-    :param training_file_path:
-    :return:
-    """
-
-    # Read title training data
-    training_data = pandas.read_csv(training_file_path, encoding="utf-8", low_memory=False)
-    training_data = training_data.loc[-training_data["Line Number"].isnull(), :]
-    training_data.head()
-
-    # All data
-    all_feature_list = []
-    all_target_list = []
-    all_file_lines = []
-
-    # Build training data
-    for _, row in training_data.iterrows():
-        # Download file
-        file_url = row["File"].replace("https://github.com/", "https://raw.githubusercontent.com/").replace("/blob/",
-                                                                                                            "/")
-        file_text = requests.get(file_url).text
-        file_lines = file_text.splitlines()
-
-        # Get features and target for model
-        feature_data = build_document_title_features(file_text)
-        target_data = pandas.Series(numpy.zeros((feature_data.shape[0],)))
-
-        # Parse line numbers
-        if "-" in row["Line Number"]:
-            target_line_ranges = row["Line Number"].split("-")
-            target_lines = list(range(int(target_line_ranges[0]),
-                                      int(target_line_ranges[1]) + 1))
-        else:
-            target_lines = [int(row["Line Number"])]
-
-        if len(target_lines) > 2:
-            continue
-
-        for target_line_num in target_lines:
-            if len(file_lines[target_line_num - 1].strip()) > 0:
-                target_data.iloc[target_line_num - 1] = 1
-
-        # Append
-        all_feature_list.append(feature_data)
-        all_target_list.append(target_data)
-        all_file_lines.extend((row["File"], l) for l in file_lines)
-
-    # Collate
-    all_feature_df = pandas.concat(all_feature_list, axis=0)
-    all_target_df = pandas.concat(all_target_list, axis=0)
-
-    # Build final model
-    model = sklearn.ensemble.ExtraTreesClassifier(n_estimators=25)
-    model.fit(all_feature_df, all_target_df)
-
-    # Save production model
-    joblib.dump(model, "title_locator.pickle")
 
 
 @safe_failure

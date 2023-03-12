@@ -18,10 +18,8 @@ __email__ = "support@contraxsuite.com"
 import os
 import string
 import unicodedata
-
 from typing import Generator, List, Optional, Tuple, Any, Union
 
-# Packages
 import pandas
 import regex as re
 import joblib
@@ -200,59 +198,6 @@ def get_section_feature_names(
     return feature_vector
 
 
-# TODO: we let errors arise silently
-@safe_failure
-def get_sections(text, window_pre=3, window_post=3, score_threshold=0.5) -> Generator:
-    """
-    Get sections from text.
-    NLP-based detection of sections.
-    :param text:
-    :param window_pre:
-    :param window_post:
-    :param score_threshold:
-    :return:
-    """
-
-    # Get document character distribution
-    doc_distribution = build_document_line_distribution(text)
-    lines = text.splitlines()
-    test_feature_data = []
-    for line_id in range(len(lines)):
-        test_feature_data.append(
-            build_section_break_features(lines, line_id, window_pre, window_post, include_doc=doc_distribution))
-
-    # Predict page breaks
-    columns = list(get_section_feature_names(len(lines), window_pre, window_post, include_doc=doc_distribution))
-    columns.sort()
-    test_feature_df = pandas.DataFrame(test_feature_data, columns=columns).fillna(-1)
-    test_predicted_lines = SectionSegmenterModel.SECTION_SEGMENTER_MODEL.predict_proba(test_feature_df)
-    predicted_df = pandas.DataFrame(test_predicted_lines, columns=["prob_false", "prob_true"])
-    section_breaks = predicted_df.loc[predicted_df["prob_true"] >= score_threshold, :].index.tolist()
-
-    if len(section_breaks) > 0:
-        # Get first break
-        pos0 = 0
-        pos1 = section_breaks[0]
-        section = "\n".join(lines[pos0:pos1])
-        if len(section.strip()) > 0:
-            yield section
-
-        # Iterate through section breaks
-        for i in range(len(section_breaks) - 1):
-            # Get breaks
-            pos0 = section_breaks[i]
-            pos1 = section_breaks[i + 1]
-            # Get text
-            section = "\n".join(lines[pos0:pos1])
-            if len(section.strip()) > 0:
-                yield section
-
-        # Yield final section
-        section = "\n".join(lines[section_breaks[-1]:])
-        if len(section.strip()) > 0:
-            yield section
-
-
 SECTION_TITLE_PTN = r"""
 \s*
 (
@@ -294,16 +239,14 @@ def get_sections_re(text) -> Generator:
 
 @safe_failure
 def get_section_spans(text: str,
-                      use_ml=True,
                       return_text=True,
                       skip_empty_headers=False,
                       sections_hierarchy: Optional[List[Any]] = None) -> \
         Generator[DocumentSection, None, None]:
     """
-    Get sections from text.
-    Use NLP-based detection OR regex-bases detection of sections - see use_ml param.
+    Get sections from text using regex.
+
     :param text: str - source full text
-    :param use_ml: bool - use sklearn classifier otherwise use regex-based detection
     :param return_text: bool - return section text
     :param skip_empty_headers: bool - return results containing headers only
     :param sections_hierarchy: list of regexes
@@ -312,7 +255,7 @@ def get_section_spans(text: str,
 
     _start_index_counter = 0
     level_parser = SectionLevelParser(sections_hierarchy=sections_hierarchy)
-    sections_detector = get_sections if use_ml else get_sections_re
+    sections_detector = get_sections_re
 
     for section in sections_detector(text):
         start_index = _start_index_counter + text[_start_index_counter:].index(section)

@@ -95,11 +95,6 @@ Subclasses of `lexnlp.ml.predictor.ProbabilityPredictor` should use a Scikit-Lea
 
 ---
 
-### `lexnlp.ml.sklearn_transformers`
-
-Scikit-Learn transformers for usage in Scikit-Learn Pipelines. Read more here: https://scikit-learn.org/stable/data_transforms.html
-
-
 ### `lexnlp.ml.vectorizers`
 
 Classes in this module form vector representations of strings.

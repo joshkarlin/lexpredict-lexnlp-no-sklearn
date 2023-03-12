@@ -30,7 +30,7 @@ import random
 import string
 
 from lexnlp.extract.en.dates import get_dates_list, get_date_features, \
-    get_raw_date_list, train_default_model
+    get_raw_date_list
 from lexnlp.tests import lexnlp_tests
 
 
@@ -221,11 +221,3 @@ class TestDates(TestCase):
              'bigram_97': 0.0, 'bigram_75': 0.0, 'bigram_84': 0.0, 'bigram_08': 0.0, 'bigram_98': 0.0,
              'bigram_79': 0.0, 'bigram_21': 0.0, 'bigram_04': 0.0, 'char_7': 0.0, 'bigram_57': 0.0,
              'char_6': 0.0, 'bigram_94': 0.0})
-
-    @pytest.mark.serial
-    def debug_build_model(self):
-        """
-        Test build model by running default train.
-        :return:
-        """
-        train_default_model(save=False)

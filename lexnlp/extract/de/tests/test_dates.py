@@ -23,7 +23,6 @@ import pytest
 from lexnlp.extract.all_locales.languages import Locale
 from lexnlp.extract.common.annotations.date_annotation import DateAnnotation
 from lexnlp.extract.de.dates import get_date_list, get_date_annotations, parser
-from lexnlp.extract.de.dates_de_classifier import train_default_model
 from lexnlp.tests.typed_annotations_tests import TypedAnnotationsTester
 
 
@@ -160,11 +159,6 @@ class TestDeDatesPlain(TestCase):
             get_dates_ordered,
             'lexnlp/typed_annotations/de/date/dates.txt',
             DateAnnotation)
-
-    @pytest.mark.serial
-    def debug_test_train_classifier(self):
-        train_default_model(save=True, verbose=False, check_date_strings=True)
-
 
 def get_dates_ordered(text: str) -> List[DateAnnotation]:
     dates = list(get_date_annotations(text))

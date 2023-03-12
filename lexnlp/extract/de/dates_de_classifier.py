@@ -13,7 +13,6 @@ import random
 from num2words import num2words
 from lexnlp.extract.all_locales.languages import Locale
 from lexnlp.extract.common.dates import DateParser
-from lexnlp.extract.common.dates_classifier_model import build_date_model
 from lexnlp.extract.de.date_model import DATE_MODEL_CHARS, MONTH_NAMES, DE_ALPHA_CHAR_SET
 from lexnlp.extract.de.dates import MODEL_DATE
 from lexnlp.extract.de.de_date_parser import DeDateParser
@@ -38,40 +37,6 @@ def setup_date_parser(check_date_string: bool) -> DateParser:
                         classifier_model=MODEL_DATE,
                         alphabet_character_set=DE_ALPHA_CHAR_SET,
                         count_words=True)
-
-
-def train_default_model(save=True, verbose=False, check_date_strings=False):
-    """
-    Train default model.
-    """
-    examples = make_date_samples()
-
-    for j in range(1, 25):
-        examples.append((f'mit {j}', []))
-        examples.append((f'Leasing mit {j}.500€ Anzahlung', []))
-
-    for j in range(2, 19):
-        examples.append((f'{j} Jahren', []))
-
-    # Add random numeric date examples
-    add_numeric_date_samples(examples)
-
-    # Output
-    output_path = 'test_date_model.pickle'
-    if save:
-        output_path = os.path.join(MODULE_PATH, 'date_model.pickle')
-
-    parser = setup_date_parser(check_date_strings)
-    build_date_model(examples,
-                     output_path,
-                     lambda date_str: [(d['value'].date(), (d['location_start'], d['location_end']))
-                                       for d in parser.get_dates(date_str)],
-                     characters=DATE_MODEL_CHARS,
-                     alphabet_char_set=DE_ALPHA_CHAR_SET,
-                     count_words=True,
-                     verbose=verbose)
-    if not save:
-        os.unlink('test_date_model.pickle')
 
 
 def make_date_samples():
