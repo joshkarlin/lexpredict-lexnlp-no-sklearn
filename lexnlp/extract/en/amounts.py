@@ -37,6 +37,7 @@ __email__ = "support@contraxsuite.com"
 
 import string
 from decimal import Decimal, DecimalTuple, InvalidOperation
+from os import environ
 from typing import Dict, Generator, Optional, Tuple, Union, List
 
 import nltk
@@ -190,7 +191,8 @@ def cleanup(text) -> str:
         next(re.finditer(BIG_NUMBERS_RE, text))
         only_digits_and_delimiters: str = \
             next(re.finditer(ONLY_DIGITS_AND_DELIMITERS_RE, text)).captures()[0]
-        delimiters: Optional[Dict] = infer_delimiters(only_digits_and_delimiters, 'en_US')
+        _locale = environ["LANG"]
+        delimiters: Optional[Dict] = infer_delimiters(only_digits_and_delimiters, _locale)
     except StopIteration:
         delimiters: Optional[Dict] = infer_delimiters(text, 'en_US')
 

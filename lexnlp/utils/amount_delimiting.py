@@ -136,7 +136,7 @@ def infer_delimiters(
 
     Args:
         text: an input string of digits and delimiters
-        _locale: an input string like `en_US` or `de_CH`
+        _locale: an input string like `en_US.UTF-8` or `de_CH.UTF-8`
 
     Returns:
         A dictionary with two keys:
@@ -163,7 +163,7 @@ def infer_delimiters(
     # TODO: be careful with the locale string!
     #   - ".UTF-8" is hardcoded... will this always be correct?
     #   - exception handling for when locales are not available
-    with LocaleContextManager(locale.LC_NUMERIC, f'{_locale}.UTF-8'):
+    with LocaleContextManager(locale.LC_NUMERIC, _locale):
         locale_conventions = locale.localeconv()
         decimal_delimiter: str = locale_conventions['decimal_point']
         group_delimiter: str = locale_conventions['thousands_sep']
