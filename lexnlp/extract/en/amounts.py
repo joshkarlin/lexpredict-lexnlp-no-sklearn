@@ -37,6 +37,7 @@ __email__ = "support@contraxsuite.com"
 
 import string
 from decimal import Decimal, DecimalTuple, InvalidOperation
+from logging import getLogger
 from os import environ
 from typing import Dict, Generator, Optional, Tuple, Union, List
 
@@ -47,9 +48,10 @@ from num2words import num2words
 from lexnlp.utils.amount_delimiting import infer_delimiters
 from lexnlp.extract.common.annotations.amount_annotation import AmountAnnotation
 
+logger = getLogger("lexnlp")
+
 
 # Define small numbers
-
 
 SMALL_NUMBERS: List[int] = [*range(0, 21, 1), *range(30, 100, 10)]
 SMALL_NUMBERS_MAP = {num2words(n): n for n in SMALL_NUMBERS}
@@ -402,7 +404,10 @@ def get_amount_annotations(
             continue
         try:
             amount: Optional[Decimal] = text2num(found_item)
-        except:
+        except LocaleError as e:
+            raise e
+        except Exception as e:
+            logger.warning(f'Cannot parse amount: {found_item}\n{e}')
             continue
         if amount is None:
             continue
