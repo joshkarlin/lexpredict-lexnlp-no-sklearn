@@ -189,15 +189,14 @@ def cleanup(text) -> str:
     ):
         text = text.lstrip(punctuation_and_whitespace)
 
-    # TODO: do not hardcode 'en_US'! This should come from a locale string
+    _locale = environ["LANG"]
     try:
         next(re.finditer(BIG_NUMBERS_RE, text))
         only_digits_and_delimiters: str = \
             next(re.finditer(ONLY_DIGITS_AND_DELIMITERS_RE, text)).captures()[0]
-        _locale = environ["LANG"]
         delimiters: Optional[Dict] = infer_delimiters(only_digits_and_delimiters, _locale)
     except StopIteration:
-        delimiters: Optional[Dict] = infer_delimiters(text, 'en_US')
+        delimiters: Optional[Dict] = infer_delimiters(text, _locale)
 
     if delimiters is None:
         return text
