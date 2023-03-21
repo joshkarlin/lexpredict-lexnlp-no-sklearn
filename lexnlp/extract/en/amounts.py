@@ -35,6 +35,7 @@ __email__ = "support@contraxsuite.com"
 
 # pylint: disable=bare-except
 
+import locale
 import string
 from decimal import Decimal, DecimalTuple, InvalidOperation
 from logging import getLogger
@@ -404,7 +405,7 @@ def get_amount_annotations(
             continue
         try:
             amount: Optional[Decimal] = text2num(found_item)
-        except LocaleError as e:
+        except locale.Error as e:
             raise e
         except Exception as e:
             logger.warning(f'Cannot parse amount: {found_item}\n{e}')

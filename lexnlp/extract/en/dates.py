@@ -16,6 +16,7 @@ __email__ = "support@contraxsuite.com"
 # Standard imports
 import calendar
 import datetime
+import locale
 import os
 import random
 from logging import getLogger
@@ -240,7 +241,7 @@ def get_raw_dates(text, strict=False, base_date=None,
                         date_string = ' '.join(_date_string_tokens)
                     try:
                         date = date_finder.parse_date_string(date_string, date_props, locale=locale)
-                    except LocaleError as e:
+                    except locale.Error as e:
                         raise e
                     except Exception as e:
                         logger.warning(f'Cannot parse date: {date}\n{e}')
