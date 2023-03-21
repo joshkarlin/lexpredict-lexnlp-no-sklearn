@@ -161,13 +161,15 @@ def infer_delimiters(
             return None
 
     # TODO: be careful with the locale string!
+    # ! Yeah no shit
     #   - ".UTF-8" is hardcoded... will this always be correct?
     #   - exception handling for when locales are not available
-    with LocaleContextManager(locale.LC_NUMERIC, _locale):
-        locale_conventions = locale.localeconv()
-        decimal_delimiter: str = locale_conventions['decimal_point']
-        group_delimiter: str = locale_conventions['thousands_sep']
-        grouping: List[int] = locale_conventions['grouping']
+    # ! switched to using the current locale and not fucking around
+    # with LocaleContextManager(locale.LC_NUMERIC, _locale):
+    locale_conventions = locale.localeconv()
+    decimal_delimiter: str = locale_conventions['decimal_point']
+    group_delimiter: str = locale_conventions['thousands_sep']
+    grouping: List[int] = locale_conventions['grouping']
 
     delimiters, blocks = get_delimited_blocks(text)
     len_delimiters: int = len(delimiters)
